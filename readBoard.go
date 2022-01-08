@@ -2,7 +2,6 @@ package main
 
 import (
 	"bufio"
-	"fmt"
 	"io"
 	"log"
 	"os"
@@ -24,7 +23,7 @@ func transpose(slice [][]string) [][]string {
 	return result
 }
 
-func ReadBoard(csvfilename string) (r [][]string, err error) {
+func ReadBoard(csvfilename string, byCol bool) (r [][]string) {
 	csvfile, err := os.Open(csvfilename)
 	if err != nil {
 		log.Fatalln("Couldn't open the csv file", err)
@@ -49,14 +48,8 @@ func ReadBoard(csvfilename string) (r [][]string, err error) {
 		s := strings.Fields(line)
 		r = append(r, s)
 	}
-	return
-}
-
-func main() {
-	if len(os.Args) < 2 {
-		log.Fatalln("One parameter required, the input CSV file.")
+	if byCol {
+		r = transpose(r)
 	}
-	board, err := ReadBoard(os.Args[1])
-	fmt.Printf("err: %v\n", err)
-	fmt.Printf("%v\n", board)
+	return
 }
