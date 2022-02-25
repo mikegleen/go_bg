@@ -6,9 +6,6 @@ import (
 	"strings"
 )
 
-// yellow := color.New(color.FgYellow).SprintFunc()
-// red := color.New(color.FgRed).SprintFunc()
-// green := color.New(color.FgGreen).SprintFunc()
 const leftwardsArrow string = "\u2190"
 const upwardsArrow string = "\u2191"
 const rightwardsArrow string = "\u2192"
@@ -31,25 +28,37 @@ type Node struct {
 	// whether to drill.
 	OilReserve int
 	Exhausted  bool
-	Goal       int
+	Goal       int // count of adjacent nodes with unbuilt wells
 	Derrick    bool
-	Truck      *Player
-	Adjacent   []*Node
-	Cell       string
+	Truck      *Player // set when a truck moves here
+	Adjacent   []*Node // will be populated by SetNeighbors
+	Cell       string  // this node's string from rawboard, for debugging
 
 	// Fields set by dijkstra
 	Distance int
+	PqIndex  int
 	Previous *Node
 }
+
+type NodeList []*Node // implements Sort.Interface
+
+func (nl NodeList) Len() int           { return len(nl) }
+func (nl NodeList) Less(i, j int) bool { return nl[i].Distance > nl[j].Distance }
+func (nl NodeList) Swap(i, j int)      { nl[i], nl[j] = nl[j], nl[i] }
 
 func NewNode(row, col int, derrick bool) *Node {
 	node := new(Node)
 	node.Row = row
 	node.Col = col
-	node.Id = fmt.Sprintf("%d,%d", row, col)
+	node.Id = fmt.Sprintf("<%d,%d>", row, col)
 	node.Derrick = derrick
 	node.Distance = math.MaxInt
 	return node
+}
+
+func (node *Node) ResetNode() {
+	node.Distance = math.MaxInt
+	node.Previous = nil
 }
 
 func SprintPreviousNode(n *Node) string {
@@ -60,10 +69,21 @@ func SprintPreviousNode(n *Node) string {
 	return ret
 }
 
-func SprintNode(n *Node) string {
+func (n *Node) SprintNode() string {
+	/*
+		Implement the function of the Python __str__ method
+	*/
+
+	tf := func(b bool) string {
+		t := "F"
+		if b {
+			t = "T"
+		}
+		return t
+	}
 
 	s := fmt.Sprintf("%s t: %d, w: %d ", n.Id, n.Terrain, n.Wells)
-	s += fmt.Sprintf("ex=%t, goal=%d, derrick=%t, truck=%s, ", n.Exhausted, n.Goal, n.Derrick, SprintPlayer(n.Truck))
+	s += fmt.Sprintf("ex=%s, goal=%d, derrick=%s, truck=%s, ", tf(n.Exhausted), n.Goal, tf(n.Derrick), SprintPlayer(n.Truck))
 	s += fmt.Sprintf("previous={%s}, ", SprintPreviousNode(n))
 	d := fmt.Sprintf("%d", n.Distance)
 	if n.Distance == math.MaxInt {
@@ -108,7 +128,7 @@ func (node *Node) FromArrow() string {
 		return " "
 	}
 	if node.Row == previous.Row {
-		if node.Row > previous.Row {
+		if node.Col > previous.Col {
 			return leftwardsArrow
 		}
 		return rightwardsArrow
@@ -119,29 +139,60 @@ func (node *Node) FromArrow() string {
 	return downwardsArrow
 }
 
-func (n *Node) set1Neighbor(board [][]*Node, nrow, ncol int) {
-	neighbor := board[nrow][ncol]
-	n.Adjacent = append(n.Adjacent, neighbor)
-	if n.Wells > 0 && !n.Derrick {
-		if neighbor.Wells == 0 {
-			neighbor.Goal += 1
+func (n *Node) SetNeighbors(board [][]*Node) {
+	/*
+		This is called by NewGraph.
+
+		:param board: the board from a Graph instance
+
+		adjacent contains a list of nodes next to this node.
+		A node can have up to 4 adjacent, reduced if it is on an edge.
+
+		:return: None. The adjacent list for this node is set.
+	*/
+	set1Neighbor := func(nrow, ncol int) {
+		neighbor := board[nrow][ncol]
+		n.Adjacent = append(n.Adjacent, neighbor)
+		if n.Wells > 0 && !n.Derrick {
+			if neighbor.Wells == 0 {
+				neighbor.Goal += 1
+			}
 		}
 	}
-}
-func (n *Node) SetNeighbors(board [][]*Node) {
 
 	lastrow := len(board) - 1
 	lastcol := len(board[0]) - 1
 	if n.Row > 0 {
-		n.set1Neighbor(board, n.Row-1, n.Col)
+		set1Neighbor(n.Row-1, n.Col)
 	}
 	if n.Col > 0 {
-		n.set1Neighbor(board, n.Row, n.Col-1)
+		set1Neighbor(n.Row, n.Col-1)
 	}
 	if n.Row < lastrow {
-		n.set1Neighbor(board, n.Row+1, n.Col)
+		set1Neighbor(n.Row+1, n.Col)
 	}
 	if n.Col < lastcol {
-		n.set1Neighbor(board, n.Row, n.Col+1)
+		set1Neighbor(n.Row, n.Col+1)
 	}
+}
+
+func (n *Node) AddDerrick() {
+	if n.Derrick {
+		panic("node " + n.Id + " already has derrick.")
+	}
+	n.Derrick = true
+	for _, node := range n.Adjacent {
+		node.Goal--
+		if node.Goal <= 0 {
+			panic("node " + node.Id + " Goal <= 0, adding derrick to node " + n.Id)
+		}
+	}
+}
+
+func (n *Node) RemoveDerrick() {
+	if !n.Derrick {
+		panic("node " + n.Id + " attempting to remove nonexisting derrick.")
+	}
+	n.Derrick = false
+	n.Exhausted = true
 }
