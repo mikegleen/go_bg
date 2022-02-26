@@ -1,5 +1,7 @@
 package main
 
+import "strconv"
+
 type Player struct {
 	Id int
 }
@@ -8,5 +10,5 @@ func SprintPlayer(p *Player) string {
 	if p == nil {
 		return "nil"
 	}
-	return string(p.Id)
+	return strconv.Itoa(p.Id)
 }
