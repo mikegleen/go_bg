@@ -97,7 +97,7 @@ func idist(distance int) (ret string) {
 }
 
 func dijkstra(graph *Graph, root *Node, maxcost int, verbose int) (map[*Node]bool, map[*Node]bool) {
-	var updated string = "*****"
+	var updated string
 	var current *Node
 	var nextnDist int
 
