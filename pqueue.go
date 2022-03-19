@@ -4,7 +4,7 @@ import (
 	"container/heap"
 	"fmt"
 	"math"
-	"sort"
+	// "sort"
 	"strconv"
 )
 
@@ -96,6 +96,19 @@ func idist(distance int) (ret string) {
 	return
 }
 
+func insertionsort(items []*Node) {
+	var n = len(items)
+	for i := 1; i < n; i++ {
+		j := i
+		for j > 0 {
+			if items[j-1].Distance > items[j].Distance {
+				items[j-1], items[j] = items[j], items[j-1]
+			}
+			j = j - 1
+		}
+	}
+}
+
 func dijkstra(graph *Graph, root *Node, maxcost int, verbose int) (map[*Node]bool, map[*Node]bool) {
 	var updated string
 	var current *Node
@@ -126,7 +139,8 @@ func dijkstra(graph *Graph, root *Node, maxcost int, verbose int) (map[*Node]boo
 		if current.Distance >= maxcost {
 			continue
 		}
-		sort.Sort(NodeList(current.Adjacent))
+		// sort.Sort(NodeList(current.Adjacent))
+		insertionsort(current.Adjacent)
 		for _, nextn := range current.Adjacent {
 			// fmt.Println("nextn:", nextn.Id)
 			if _, ok := visited[nextn]; ok {
