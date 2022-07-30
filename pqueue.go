@@ -109,7 +109,8 @@ func insertionsort(items []*Node) {
 	}
 }
 
-func dijkstra(graph *Graph, root *Node, maxcost int, verbose int) (map[*Node]bool, map[*Node]bool) {
+// func dijkstra(graph *Graph, root *Node, maxcost int, verbose int) (map[*Node]bool, map[*Node]bool) {
+func dijkstra(graph *Graph, root *Node, maxcost int, verbose int) ([]bool, map[*Node]bool) {
 	var updated string
 	var current *Node
 	var nextnDist int
@@ -121,8 +122,9 @@ func dijkstra(graph *Graph, root *Node, maxcost int, verbose int) (map[*Node]boo
 		maxcost = graph.BoardSize
 	}
 	unvisited_queue := make(PriorityQueue, 0)
-	visited := make(map[*Node]bool)
+	// visited := make(map[*Node]bool)
 	goals := make(map[*Node]bool)
+	visited := make([]bool, graph.BoardSize)
 	heap.Init(&unvisited_queue)
 	heap.Push(&unvisited_queue, root)
 
@@ -131,7 +133,8 @@ func dijkstra(graph *Graph, root *Node, maxcost int, verbose int) (map[*Node]boo
 		if verbose >= 3 {
 			fmt.Printf("\n****current: %v\n", current.Id)
 		}
-		visited[current] = true
+		// visited[current] = true
+		visited[current.Ix] = true
 		if current.Goal > 0 {
 			goals[current] = true
 		}
@@ -143,7 +146,8 @@ func dijkstra(graph *Graph, root *Node, maxcost int, verbose int) (map[*Node]boo
 		insertionsort(current.Adjacent)
 		for _, nextn := range current.Adjacent {
 			// fmt.Println("nextn:", nextn.Id)
-			if _, ok := visited[nextn]; ok {
+			// if _, ok := visited[nextn]; ok {
+			if visited[nextn.Ix] {
 				continue
 			}
 			if nextn.Derrick || (nextn.Truck != nil) {

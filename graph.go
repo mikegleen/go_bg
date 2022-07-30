@@ -35,6 +35,7 @@ func NewGraph(rawboard [][]string, nplayers int) *Graph {
 	graph := new(Graph)
 	graph.Nodes = make([]*Node, 0)
 
+	ix := 0
 	for i := 0; i < nrows; i++ {
 		newrow := make([]*Node, ncols)
 		for j := 0; j < ncols; j++ {
@@ -57,6 +58,8 @@ func NewGraph(rawboard [][]string, nplayers int) *Graph {
 			}
 			newrow[j] = node
 			graph.Nodes = append(graph.Nodes, node)
+			node.Ix = ix
+			ix++
 		}
 		board[i] = newrow
 	}

@@ -16,6 +16,7 @@ const downwardsArrow string = "\u2193"
 type Node struct {
 	Row     int
 	Col     int
+	Ix      int // set when the Graph is created
 	Id      string
 	Terrain int
 	// wells: int in 0..3: the number of wells on the square. If non-zero
