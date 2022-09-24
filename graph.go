@@ -1,7 +1,6 @@
 package main
 
 import (
-	// "fmt"
 	// "math"
 	"fmt"
 	"regexp"
@@ -16,12 +15,12 @@ type Graph struct {
 	Rows         int
 	Columns      int
 	BoardSize    int
-	Board        [][]*Node
-	Nodes        []*Node
+	Board        [][]*Node // rows, columns
+	Nodes        []*Node   // 1d array easier to iterate over all nodes
 	/*
 	   TerrainCh is indexed by terrain type. Zero is illegal. Types 1, 2, and 3
 	   refer to flat, hilly, or mountain and correspond to the cost of moving into
-	   that square.
+	   that square. The values will be ASCII graphics to display on the map.
 	*/
 	TerrainCh [4]string
 }
