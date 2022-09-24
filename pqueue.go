@@ -96,7 +96,7 @@ func idist(distance int) (ret string) {
 	return
 }
 
-func insertionsort(items []*Node) {
+func selectionSort(items []*Node) {
 	var n = len(items)
 	for i := 1; i < n; i++ {
 		j := i
@@ -106,6 +106,18 @@ func insertionsort(items []*Node) {
 			}
 			j = j - 1
 		}
+	}
+}
+
+func insertionsort(A []*Node) {
+	for i := 1; i < len(A); i++ {
+		key := A[i]
+		j := i - 1
+		for j > -1 && A[j].Distance > key.Distance {
+			A[j+1] = A[j]
+			j -= 1
+		}
+		A[j+1] = key
 	}
 }
 
@@ -142,7 +154,6 @@ func dijkstra(graph *Graph, root *Node, maxcost int, verbose int) ([]bool, map[*
 		if current.Distance >= maxcost {
 			continue
 		}
-		// sort.Sort(NodeList(current.Adjacent))
 		insertionsort(current.Adjacent)
 		for _, nextn := range current.Adjacent {
 			// fmt.Println("nextn:", nextn.Id)
