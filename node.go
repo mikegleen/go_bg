@@ -19,11 +19,11 @@ type Node struct {
 	Ix      int // set when the Graph is created
 	Id      string
 	Terrain int
-	// wells: int in 0..3: the number of wells on the square. If non-zero
+	// Wells: int in 0..3: the number of wells on the square. If non-zero
 	// the square is covered with a tile at the start of the game. Wells
 	// are assigned when the Graph is instantiated.
 	Wells int
-	// oil_reserve: the number on the bottom side of the tile covering a
+	// OilReserve: the number on the bottom side of the tile covering a
 	// square with well(s) or the number of plastic markers under a derrick.
 	// If wells == 2 then we cannot peek at the oil reserve in deciding
 	// whether to drill.
