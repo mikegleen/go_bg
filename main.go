@@ -31,7 +31,7 @@ func getargs() argstruct {
 	args := argstruct{}
 	flag.StringVar(&args.board, "board", RAWBOARD, `The file containing the board description.`)
 	flag.IntVar(&args.column, "column", 0, `Start column. For testing.`)
-	flag.BoolVar(&args.dijkstra, "dijkstra", false, "")
+	flag.BoolVar(&args.dijkstra, "dijkstra", false, "Test the dijkstra function.")
 	flag.IntVar(&args.games, "games", 1, `Number of games to play. Defaults is 1.`)
 	flag.IntVar(&args.maxcost, "maxcost", math.MaxInt, `Maximum distance of interest. For testing.`)
 	flag.IntVar(&args.nplayers, "nplayers", 4, `The number of players; the default is 4.`)
