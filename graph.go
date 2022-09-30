@@ -25,23 +25,23 @@ type Graph struct {
 	TerrainCh [4]string
 }
 
-func NewGraph(rawboard [][]string, nplayers int) *Graph {
-	threePlayers := nplayers == 3
+func NewGraph(rawBoard [][]string, nPlayers int) *Graph {
+	threePlayers := nPlayers == 3
 	re := regexp.MustCompile(`(\d?)(\.(\d?)([xd]?))?`)
-	nrows := len(rawboard)
-	ncols := len(rawboard[0])
-	board := make([][]*Node, nrows)
+	nRows := len(rawBoard)
+	nCols := len(rawBoard[0])
+	board := make([][]*Node, nRows)
 	graph := new(Graph)
 	graph.Nodes = make([]*Node, 0)
 
 	ix := 0
-	for i := 0; i < nrows; i++ {
-		newrow := make([]*Node, ncols)
-		for j := 0; j < ncols; j++ {
+	for i := 0; i < nRows; i++ {
+		newRow := make([]*Node, nCols)
+		for j := 0; j < nCols; j++ {
 			node := NewNode(i, j, false)
-			m := re.FindStringSubmatch(rawboard[i][j])
+			m := re.FindStringSubmatch(rawBoard[i][j])
 			if m == nil {
-				panic(fmt.Sprintf("Bad format rawboard[%d][%d] = '%s'", i, j, rawboard[i][j]))
+				panic(fmt.Sprintf("Bad format rawBoard[%d][%d] = '%s'", i, j, rawBoard[i][j]))
 			}
 			node.Terrain = 1
 			if m[1] != "" {
@@ -55,17 +55,17 @@ func NewGraph(rawboard [][]string, nplayers int) *Graph {
 			if m[4] == "d" {
 				node.Derrick = true
 			}
-			newrow[j] = node
+			newRow[j] = node
 			graph.Nodes = append(graph.Nodes, node)
 			node.Ix = ix
 			ix++
 		}
-		board[i] = newrow
+		board[i] = newRow
 	}
 	graph.Board = board
-	graph.Rows = nrows
-	graph.Columns = ncols
-	graph.BoardSize = nrows * ncols
+	graph.Rows = nRows
+	graph.Columns = nCols
+	graph.BoardSize = nRows * nCols
 	for _, node := range graph.Nodes {
 		node.SetNeighbors(board)
 	}
@@ -93,13 +93,13 @@ func (g Graph) PrintBoard() {
 	}
 	fmt.Printf("   %s|\n", s)
 
-	for nrow, row := range g.Board {
+	for nRow, row := range g.Board {
 		fmt.Println("   " + strings.Repeat("|—————", g.Columns) + "|")
 		r1 := ""
 		for _, node := range row {
 			r1 += g.TerrainCh[node.Terrain] + node.PrDist() + "|"
 		}
-		fmt.Printf(" %02d|%s\n", nrow, r1)
+		fmt.Printf(" %02d|%s\n", nRow, r1)
 		r2 := ""
 		for _, node := range row {
 			goal := " "

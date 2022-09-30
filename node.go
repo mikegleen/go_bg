@@ -13,11 +13,13 @@ const downwardsArrow string = "\u2193"
 
 // terrainCh := []string{"@", green("-  "), green("~~ "), green("^^^")}
 
+// The Node values are set in graph.NewGraph
 type Node struct {
-	Row     int
-	Col     int
-	Ix      int // set when the Graph is created
-	Id      string
+	Row int
+	Col int
+	Ix  int // set when the Graph is created
+	Id  string
+	// Terrain: 1..3: cost of entering the node
 	Terrain int
 	// Wells: int in 0..3: the number of wells on the square. If non-zero
 	// the square is covered with a tile at the start of the game. Wells

@@ -23,9 +23,9 @@ func transpose(slice [][]string) [][]string {
 	return result
 }
 
-func ReadBoard(csvfilename string, byCol bool) (r [][]string) {
+func ReadBoard(csvFilename string, byCol bool) (r [][]string) {
 	/*
-	   :param: csvfile: The file containing the board description.
+	   :param: csvFilename: The file containing the board description.
 	   Each line in the csv file describes one row or one column of the board,
 	   depending on argument --bycols.
 	   Lines beginning with '#' and blank lines are ignored.
@@ -44,15 +44,15 @@ func ReadBoard(csvfilename string, byCol bool) (r [][]string) {
 	   :return: A list of rows containing tuples corresponding to the columns.
 	            Each cell is the string as defined above.
 	*/
-	csvfile, err := os.Open(csvfilename)
+	csvFile, err := os.Open(csvFilename)
 	if err != nil {
 		log.Fatalln("Couldn't open the csv file", err)
 	}
-	defer csvfile.Close()
+	defer csvFile.Close()
 	// Parse the file
 	nline := 0
 
-	scanner := bufio.NewScanner(csvfile)
+	scanner := bufio.NewScanner(csvFile)
 	for scanner.Scan() {
 		line := scanner.Text()
 		err = scanner.Err()

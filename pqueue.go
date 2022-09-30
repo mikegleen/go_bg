@@ -4,6 +4,7 @@ import (
 	"container/heap"
 	"fmt"
 	"math"
+
 	// "sort"
 	"strconv"
 )
@@ -11,8 +12,12 @@ import (
 // A PriorityQueue implements heap.Interface and holds Items.
 type PriorityQueue []*Node
 
+// There are mixed receiver types because heap inherits sort.
+
+//goland:noinspection GoMixedReceiverTypes
 func (pq PriorityQueue) Len() int { return len(pq) }
 
+//goland:noinspection GoMixedReceiverTypes
 func (pq PriorityQueue) Less(i, j int) bool {
 	// We want Pop to give us the highest, not lowest, priority so we use greater than here.
 	// mlg: modified to give lowest
@@ -20,12 +25,14 @@ func (pq PriorityQueue) Less(i, j int) bool {
 	return pq[i].Distance < pq[j].Distance
 }
 
+//goland:noinspection GoMixedReceiverTypes
 func (pq PriorityQueue) Swap(i, j int) {
 	pq[i], pq[j] = pq[j], pq[i]
 	pq[i].PqIndex = i
 	pq[j].PqIndex = j
 }
 
+//goland:noinspection GoMixedReceiverTypes
 func (pq *PriorityQueue) Push(x interface{}) {
 	n := len(*pq)
 	item := x.(*Node)
@@ -33,6 +40,7 @@ func (pq *PriorityQueue) Push(x interface{}) {
 	*pq = append(*pq, item)
 }
 
+//goland:noinspection GoMixedReceiverTypes
 func (pq *PriorityQueue) Pop() interface{} {
 	old := *pq
 	n := len(old)
@@ -44,12 +52,14 @@ func (pq *PriorityQueue) Pop() interface{} {
 }
 
 // update modifies the priority and value of an Item in the queue.
-func (pq *PriorityQueue) update(item *Node, value string, Distance int) {
+//
+//goland:noinspection GoMixedReceiverTypes
+func (pq *PriorityQueue) update(item *Node, Distance int) {
 	item.Distance = Distance
 	heap.Fix(pq, item.PqIndex)
 }
 
-// This example creates a PriorityQueue with some items, adds and manipulates an item,
+// PqMain This example creates a PriorityQueue with some items, adds and manipulates an item,
 // and then removes the items in priority order.
 func PqMain() {
 	// Some items and their priorities.
@@ -77,7 +87,7 @@ func PqMain() {
 		Distance: 1,
 	}
 	heap.Push(&pq, item)
-	pq.update(item, item.Id, 5)
+	pq.update(item, 5)
 
 	// Take the items out; they arrive in decreasing priority order.
 	for pq.Len() > 0 {
@@ -87,7 +97,7 @@ func PqMain() {
 	fmt.Println()
 }
 
-func idist(distance int) (ret string) {
+func iDist(distance int) (ret string) {
 	if distance == math.MaxInt {
 		ret = "∞"
 	} else {
@@ -96,6 +106,7 @@ func idist(distance int) (ret string) {
 	return
 }
 
+/*
 func selectionSort(items []*Node) {
 	var n = len(items)
 	for i := 1; i < n; i++ {
@@ -108,8 +119,9 @@ func selectionSort(items []*Node) {
 		}
 	}
 }
+*/
 
-func insertionsort(A []*Node) {
+func insertionSort(A []*Node) {
 	for i := 1; i < len(A); i++ {
 		key := A[i]
 		j := i - 1
@@ -121,8 +133,8 @@ func insertionsort(A []*Node) {
 	}
 }
 
-// func dijkstra(graph *Graph, root *Node, maxcost int, verbose int) (map[*Node]bool, map[*Node]bool) {
-func dijkstra(graph *Graph, root *Node, maxcost int, verbose int) ([]bool, map[*Node]bool) {
+// func dijkstra(graph *Graph, root *Node, maxCost int, verbose int) (map[*Node]bool, map[*Node]bool) {
+func dijkstra(graph *Graph, root *Node, maxCost int, verbose int) ([]bool, map[*Node]bool) {
 	var updated string
 	var current *Node
 	var nextnDist int
@@ -130,18 +142,18 @@ func dijkstra(graph *Graph, root *Node, maxcost int, verbose int) ([]bool, map[*
 	graph.ResetGraph()
 	root.Distance = 0
 	root.PqIndex = 0
-	if maxcost > graph.BoardSize {
-		maxcost = graph.BoardSize
+	if maxCost > graph.BoardSize {
+		maxCost = graph.BoardSize
 	}
-	unvisited_queue := make(PriorityQueue, 0)
+	unvisitedQueue := make(PriorityQueue, 0)
 	// visited := make(map[*Node]bool)
 	goals := make(map[*Node]bool)
 	visited := make([]bool, graph.BoardSize)
-	heap.Init(&unvisited_queue)
-	heap.Push(&unvisited_queue, root)
+	heap.Init(&unvisitedQueue)
+	heap.Push(&unvisitedQueue, root)
 
-	for len(unvisited_queue) > 0 {
-		current = heap.Pop(&unvisited_queue).(*Node)
+	for len(unvisitedQueue) > 0 {
+		current = heap.Pop(&unvisitedQueue).(*Node)
 		if verbose >= 3 {
 			fmt.Printf("\n****current: %v\n", current.Id)
 		}
@@ -151,35 +163,53 @@ func dijkstra(graph *Graph, root *Node, maxcost int, verbose int) ([]bool, map[*
 			goals[current] = true
 		}
 
-		if current.Distance >= maxcost {
+		if current.Distance >= maxCost {
 			continue
 		}
-		insertionsort(current.Adjacent)
-		for _, nextn := range current.Adjacent {
-			// fmt.Println("nextn:", nextn.Id)
-			// if _, ok := visited[nextn]; ok {
-			if visited[nextn.Ix] {
+		insertionSort(current.Adjacent)
+		for _, nextN := range current.Adjacent {
+			// fmt.Println("nextN:", nextN.Id)
+			// if _, ok := visited[nextN]; ok {
+			if visited[nextN.Ix] {
 				continue
 			}
-			if nextn.Derrick || (nextn.Truck != nil) {
+			// You may not enter or cross a node with a derrick or truck.
+			if nextN.Derrick || (nextN.Truck != nil) {
 				continue
 			}
-			newDist := current.Distance + nextn.Terrain
-			nextnDist = nextn.Distance
+			newDist := current.Distance + nextN.Terrain
+			nextnDist = nextN.Distance
 			// if the next node has wells, the player may not stop here
-			if nextn.Wells != 0 && newDist >= maxcost {
-				continue
+			if nextN.Wells != 0 {
+				if newDist >= maxCost {
+					continue
+				}
+				// There is still some movement credit left so it might be possible to move to an adjacent node.
+				canMove := false
+				credit := maxCost - newDist
+				for _, nextA := range nextN.Adjacent {
+					if visited[nextA.Ix] {
+						continue
+					}
+					if nextA.Terrain <= credit {
+						canMove = true
+						break
+					}
+				}
+				if !canMove {
+					continue
+				}
 			}
 			updated = "not updated"
-			if newDist < nextnDist && newDist <= maxcost {
-				nextn.Distance = newDist
-				nextn.Previous = current
-				heap.Push(&unvisited_queue, nextn)
+			if newDist < nextnDist && newDist <= maxCost {
+				nextN.Distance = newDist
+				nextN.Previous = current
+				heap.Push(&unvisitedQueue, nextN)
 				updated = "updated" // for logging
 			}
 
 			if verbose >= 3 {
-				fmt.Printf("    %v: current: %v, next: %v, dist: %v -> %v", updated, current.Id, nextn.Id, idist(nextnDist), nextn.Distance)
+				fmt.Printf("    %v: current: %v, next: %v, dist: %v -> %v", updated, current.Id, nextN.Id, iDist(nextnDist), nextN.Distance)
 			}
 		}
 	}

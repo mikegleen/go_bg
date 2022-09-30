@@ -4,7 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"math"
-
+	"os"
 	// "runtime/pprof"
 	"time"
 )
@@ -20,6 +20,7 @@ type argstruct struct {
 	games    int
 	maxcost  int
 	nplayers int
+	pqMain   bool
 	print    bool
 	row      int
 	timeit   int
@@ -27,11 +28,12 @@ type argstruct struct {
 	verbose  int
 }
 
-func getargs() argstruct {
+func getArgs() argstruct {
 	args := argstruct{}
 	flag.StringVar(&args.board, "board", RAWBOARD, `The file containing the board description.`)
 	flag.IntVar(&args.column, "column", 0, `Start column. For testing.`)
 	flag.BoolVar(&args.dijkstra, "dijkstra", false, "Test the dijkstra function.")
+	flag.BoolVar(&args.pqMain, "pqMain", false, "Test the pqMain function.")
 	flag.IntVar(&args.games, "games", 1, `Number of games to play. Defaults is 1.`)
 	flag.IntVar(&args.maxcost, "maxcost", math.MaxInt, `Maximum distance of interest. For testing.`)
 	flag.IntVar(&args.nplayers, "nplayers", 4, `The number of players; the default is 4.`)
@@ -56,20 +58,39 @@ func main() {
 	// }
 	// defer cpufile.Close()
 	// defer pprof.StopCPUProfile()
+	fmt.Printf("TILES: %v\n", TILES)
+	fmt.Printf("tiles: %v\n", NewTiles())
+	bc := NewBeigeCards()
+	fmt.Printf("beige: %v\n", *bc.cards)
+	l := len(*bc.cards)
+	top := bc.PopBeigeCard()
+	fmt.Printf("top: %v\nlen: %v\nbeige: %v\n", top, l, *bc.cards)
 
-	var rawboard [][]string
-	args := getargs()
+	rc := NewRedCards()
+	fmt.Println("Red cards: ", rc)
+
+	licenseCards := NewLicenseCards()
+	fmt.Printf("License cards: %v\n", licenseCards.cards)
+	fmt.Println("Pop: ", licenseCards.PopLicenseCard())
+	fmt.Println("Pop: ", licenseCards.PopLicenseCard())
+	fmt.Println("Pop: ", licenseCards.PopLicenseCard())
+	var rawBoard [][]string
+	args := getArgs()
 	verbose = args.verbose
+	if args.pqMain {
+		PqMain()
+		os.Exit(0)
+	}
 	// fmt.Println("timeit", args.timeit)
-	rawboard = ReadBoard(args.board, false)
+	rawBoard = ReadBoard(args.board, false)
 	if verbose > 1 {
-		for _, row := range rawboard {
+		for _, row := range rawBoard {
 			fmt.Printf("%v\n", row)
 		}
 	}
 
 	node12 := NewNode(1, 2, false)
-	g := NewGraph(rawboard, 4)
+	g := NewGraph(rawBoard, 4)
 	if verbose > 1 {
 		fmt.Printf("node = (%v, %v) distance %v \n", node12.Row, node12.Col, node12.Distance)
 		fmt.Println(node12.SprintNode())
