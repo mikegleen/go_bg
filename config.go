@@ -15,7 +15,7 @@ import (
 //        value are allocated to the node.
 
 type Tiles struct {
-	tiles *[][]int
+	tiles [][]int
 }
 
 var TILES = [][]int{
@@ -25,23 +25,23 @@ var TILES = [][]int{
 	{4, 4, 4, 4, 5, 5, 5, 5, 6, 6, 6, 6}}
 
 func NewTiles() *Tiles {
-	tiles := make([][]int, 4)
-	for i := 1; i < 4; i++ {
-		tiles[i] = make([]int, 12)
-		copy(tiles[i], TILES[i])
-		rand.Shuffle(len(tiles[i]), func(ii, jj int) { tiles[i][ii], tiles[i][jj] = tiles[i][jj], tiles[i][ii] })
-	}
 	sTiles := new(Tiles)
-	sTiles.tiles = &tiles
+	sTiles.tiles = make([][]int, 4)
+	for i := 1; i < 4; i++ {
+		sTiles.tiles[i] = make([]int, 12)
+		copy(sTiles.tiles[i], TILES[i])
+		rand.Shuffle(len(sTiles.tiles[i]), func(ii, jj int) { sTiles.tiles[i][ii], sTiles.tiles[i][jj] = sTiles.tiles[i][jj], sTiles.tiles[i][ii] })
+	}
 	return sTiles
 }
+
 func (tiles *Tiles) PopTile(nWells int) int {
-	l := len((*tiles.tiles)[nWells])
+	l := len(tiles.tiles[nWells])
 	if l < 1 {
 		return -1
 	}
-	ret := (*tiles.tiles)[nWells][l-1]
-	(*tiles.tiles)[nWells] = (*tiles.tiles)[nWells][:l-1]
+	ret := tiles.tiles[nWells][l-1]
+	tiles.tiles[nWells] = tiles.tiles[nWells][:l-1]
 	return ret
 }
 

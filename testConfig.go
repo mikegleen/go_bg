@@ -16,13 +16,13 @@ func TestConfig() {
 	// defer pprof.StopCPUProfile()
 	fmt.Printf("TILES: %v\n", TILES)
 	nt := NewTiles()
-	fmt.Printf("tiles: %v\n", *nt.tiles)
+	fmt.Printf("tiles: %v\n", nt.tiles)
 	n := nt.PopTile(3)
 	if n == -1 {
 		fmt.Println("oops.")
 	}
 	fmt.Println("Tile 1: ", n)
-	fmt.Printf("tiles: %v\n", *nt.tiles)
+	fmt.Printf("tiles: %v\n", nt.tiles)
 
 	bc := NewBeigeCards()
 	l := len(bc.cards)
