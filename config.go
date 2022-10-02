@@ -1,6 +1,22 @@
 package main
 
-import "math/rand"
+import (
+	"math/rand"
+)
+
+// --------------------- Tiles -----------------------
+// TILES: This dict defines the cardboard pieces that cover the squares
+//        containing wells.
+//        The key is the number of oil wells, the value is a list of the
+//        number of oil markers to be allocated when a derrick is built.
+//        This list will be copied, shuffled and allocated to the nodes
+//        according to the number of wells on that node. When a player builds
+//        a derrick, the number of oil markers corresponding to the tile's
+//        value are allocated to the node.
+
+type Tiles struct {
+	tiles *[][]int
+}
 
 var TILES = [][]int{
 	{},
@@ -8,15 +24,25 @@ var TILES = [][]int{
 	{2, 2, 2, 2, 2, 2, 5, 5, 5, 5, 5, 5},
 	{4, 4, 4, 4, 5, 5, 5, 5, 6, 6, 6, 6}}
 
-func NewTiles() [][]int {
+func NewTiles() *Tiles {
 	tiles := make([][]int, 4)
 	for i := 1; i < 4; i++ {
 		tiles[i] = make([]int, 12)
 		copy(tiles[i], TILES[i])
 		rand.Shuffle(len(tiles[i]), func(ii, jj int) { tiles[i][ii], tiles[i][jj] = tiles[i][jj], tiles[i][ii] })
 	}
-	return tiles
+	sTiles := new(Tiles)
+	sTiles.tiles = &tiles
+	return sTiles
 }
+func (tiles *Tiles) PopTile(nWells int) (int, error) {
+	l := len((*tiles.tiles)[nWells])
+	ret := (*tiles.tiles)[nWells][l-1]
+	(*tiles.tiles)[nWells] = (*tiles.tiles)[nWells][:l-1]
+	return ret, nil
+}
+
+// --------------------- Red Action Cards -----------------------
 
 type RedCard struct {
 	blackLoco, nLicenses, movement, markers, backwards int
@@ -41,19 +67,26 @@ var RED_CARDS = []RedCard{
 	{2, 3, 2, 0, 5},
 }
 
-func NewRedCards() []RedCard {
+func NewRedCards() *RedCards {
 	cards := make([]RedCard, len(RED_CARDS))
 	copy(cards, RED_CARDS)
 	rand.Shuffle(len(cards), func(ii, jj int) { cards[ii], cards[jj] = cards[jj], cards[ii] })
-	return cards
+	redCards := new(RedCards)
+	redCards.cards = &cards
+	return redCards
 }
 
-func (redCards *RedCards) PopRedCard() RedCard {
+func (redCards *RedCards) PopRedCard() *RedCard {
 	l := len(*redCards.cards)
-	ret := (*redCards.cards)[l-1]
+	if l <= 0 {
+		return nil
+	}
+	ret := &(*redCards.cards)[l-1]
 	*redCards.cards = (*redCards.cards)[:l-1]
 	return ret
 }
+
+// --------------------- Beige Action Cards -----------------------
 
 type BeigeCard struct {
 	nLicenses, movement, oilPrice int
@@ -104,40 +137,44 @@ func NewBeigeCards() *BeigeCards {
 	return beigeCards
 }
 
-func (beigeCards *BeigeCards) PopBeigeCard() BeigeCard {
+func (beigeCards *BeigeCards) PopBeigeCard() *BeigeCard {
 	l := len(*beigeCards.cards)
-	ret := (*beigeCards.cards)[l-1]
+	if l <= 0 {
+		return nil
+	}
+	ret := &(*beigeCards.cards)[l-1]
 	*beigeCards.cards = (*beigeCards.cards)[:l-1]
 	return ret
 }
 
+// --------------------- License Cards -----------------------
+
 type LicenseCards struct {
-	cards *[]int
+	cards []int
 }
 
 func NewLicenseCards() *LicenseCards {
-	cards := make([]int, 78)
+	licenseCards := new(LicenseCards)
+	licenseCards.cards = make([]int, 78)
 	for i := 0; i < 39; i++ {
-		cards[i] = 1
+		licenseCards.cards[i] = 1
 	}
 	for i := 39; i < 78; i++ {
-		cards[i] = 2
+		licenseCards.cards[i] = 2
 	}
-	rand.Shuffle(len(cards), func(ii, jj int) { cards[ii], cards[jj] = cards[jj], cards[ii] })
-	licenseCards := new(LicenseCards)
-	licenseCards.cards = &cards
+	rand.Shuffle(len(licenseCards.cards), func(ii, jj int) {
+		licenseCards.cards[ii], licenseCards.cards[jj] =
+			licenseCards.cards[jj], licenseCards.cards[ii]
+	})
 	return licenseCards
 }
 
 func (licenseCards *LicenseCards) PopLicenseCard() int {
-	l := len(*licenseCards.cards)
-	ret := (*licenseCards.cards)[l-1]
-	*licenseCards.cards = (*licenseCards.cards)[:l-1]
+	l := len(licenseCards.cards)
+	if l < 1 {
+		return -1 // empty
+	}
+	ret := (licenseCards.cards)[l-1]
+	licenseCards.cards = (licenseCards.cards)[:l-1]
 	return ret
 }
-
-//func (cards *[]) Pop() int {
-//	res := (*s)[len(*s)-1]
-//	*s = (*s)[:len(*s)-1]
-//	return res
-//}
