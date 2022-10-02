@@ -35,11 +35,14 @@ func NewTiles() *Tiles {
 	sTiles.tiles = &tiles
 	return sTiles
 }
-func (tiles *Tiles) PopTile(nWells int) (int, error) {
+func (tiles *Tiles) PopTile(nWells int) int {
 	l := len((*tiles.tiles)[nWells])
+	if l < 1 {
+		return -1
+	}
 	ret := (*tiles.tiles)[nWells][l-1]
 	(*tiles.tiles)[nWells] = (*tiles.tiles)[nWells][:l-1]
-	return ret, nil
+	return ret
 }
 
 // --------------------- Red Action Cards -----------------------
@@ -93,7 +96,7 @@ type BeigeCard struct {
 }
 
 type BeigeCards struct {
-	cards *[]BeigeCard
+	cards []BeigeCard
 }
 
 var BEIGE_CARDS = []BeigeCard{
@@ -129,21 +132,20 @@ var BEIGE_CARDS = []BeigeCard{
 	{4, 10, 0}}
 
 func NewBeigeCards() *BeigeCards {
-	cards := make([]BeigeCard, len(BEIGE_CARDS))
-	copy(cards, BEIGE_CARDS)
-	rand.Shuffle(len(cards), func(ii, jj int) { cards[ii], cards[jj] = cards[jj], cards[ii] })
-	beigeCards := new(BeigeCards)
-	beigeCards.cards = &cards
-	return beigeCards
+	bc := new(BeigeCards)
+	bc.cards = make([]BeigeCard, len(BEIGE_CARDS))
+	copy(bc.cards, BEIGE_CARDS)
+	rand.Shuffle(len(bc.cards), func(ii, jj int) { bc.cards[ii], bc.cards[jj] = bc.cards[jj], bc.cards[ii] })
+	return bc
 }
 
 func (beigeCards *BeigeCards) PopBeigeCard() *BeigeCard {
-	l := len(*beigeCards.cards)
+	l := len(beigeCards.cards)
 	if l <= 0 {
 		return nil
 	}
-	ret := &(*beigeCards.cards)[l-1]
-	*beigeCards.cards = (*beigeCards.cards)[:l-1]
+	ret := &(beigeCards.cards)[l-1]
+	beigeCards.cards = beigeCards.cards[:l-1]
 	return ret
 }
 
