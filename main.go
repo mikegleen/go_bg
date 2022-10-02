@@ -48,32 +48,7 @@ func getArgs() argstruct {
 
 func main() {
 
-	// cpufile, err := os.Create("cpu.pprof")
-	// if err != nil {
-	// 	panic(err)
-	// }
-	// err = pprof.StartCPUProfile(cpufile)
-	// if err != nil {
-	// 	panic(err)
-	// }
-	// defer cpufile.Close()
-	// defer pprof.StopCPUProfile()
-	fmt.Printf("TILES: %v\n", TILES)
-	fmt.Printf("tiles: %v\n", NewTiles())
-	bc := NewBeigeCards()
-	fmt.Printf("beige: %v\n", *bc.cards)
-	l := len(*bc.cards)
-	top := bc.PopBeigeCard()
-	fmt.Printf("top: %v\nlen: %v\nbeige: %v\n", top, l, *bc.cards)
-
-	rc := NewRedCards()
-	fmt.Println("Red cards: ", rc)
-
-	licenseCards := NewLicenseCards()
-	fmt.Printf("License cards: %v\n", licenseCards.cards)
-	fmt.Println("Pop: ", licenseCards.PopLicenseCard())
-	fmt.Println("Pop: ", licenseCards.PopLicenseCard())
-	fmt.Println("Pop: ", licenseCards.PopLicenseCard())
+	TestConfig()
 	var rawBoard [][]string
 	args := getArgs()
 	verbose = args.verbose
