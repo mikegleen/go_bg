@@ -3,6 +3,8 @@ package main
 import (
 	"flag"
 	"fmt"
+	"giganten/board"
+	"giganten/dijkstra"
 	"math"
 	"os"
 	// "runtime/pprof"
@@ -80,21 +82,21 @@ func main() {
 		os.Exit(0)
 	}
 	if args.pqMain {
-		PqMain()
+		dijkstra.PqMain()
 		os.Exit(0)
 	}
 	var rawBoard [][]string
 	verbose = args.verbose
 	// fmt.Println("timeit", args.timeit)
-	rawBoard = ReadBoard(args.board, false)
+	rawBoard = board.ReadBoard(args.board, false)
 	if verbose > 1 {
 		for _, row := range rawBoard {
 			fmt.Printf("%v\n", row)
 		}
 	}
 
-	node12 := NewNode(1, 2, false)
-	g := NewGraph(rawBoard, 4)
+	node12 := board.NewNode(1, 2, false)
+	g := board.NewGraph(rawBoard, 4)
 	if verbose > 1 {
 		fmt.Printf("node = (%v, %v) distance %v \n", node12.Row, node12.Col, node12.Distance)
 		fmt.Println(node12.SprintNode())
@@ -104,7 +106,7 @@ func main() {
 	}
 
 	// visited, goals := dijkstra(g, g.Nodes[0], math.MaxInt, 3)
-	visited, goals := dijkstra(g, g.Nodes[0], 3, verbose)
+	visited, goals := dijkstra.Dijkstra(g, g.Nodes[0], 3, verbose)
 	if verbose > 1 {
 		fmt.Printf("%v\n", visited)
 		fmt.Printf("%v\n", goals)
@@ -122,7 +124,7 @@ func main() {
 	start = time.Now().UnixMilli()
 	for n := 0; n < iterations; n++ {
 		g.ResetGraph()
-		_, _ = dijkstra(g, g.Nodes[0], math.MaxInt, verbose)
+		_, _ = dijkstra.Dijkstra(g, g.Nodes[0], math.MaxInt, verbose)
 	}
 	end = time.Now().UnixMilli()
 	elapsed = end - start

@@ -1,6 +1,9 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"giganten/game"
+)
 
 func TestConfig() {
 
@@ -15,28 +18,28 @@ func TestConfig() {
 	// defer cpufile.Close()
 	// defer pprof.StopCPUProfile()
 
-	fmt.Println("TRAIN_COSTS", TRAIN_COSTS)
-	fmt.Println("INITIAL_CASH", INITIAL_CASH)
-	fmt.Println("INITIAL_PRICE", INITIAL_PRICE)
-	fmt.Println("INITIAL_OIL_RIGS", INITIAL_OIL_RIGS)
-	fmt.Println("INITIAL_OIL_MARKERS", INITIAL_OIL_MARKERS)
-	fmt.Println("TRUCK_INIT_ROWS", TRUCK_INIT_ROWS)
-	fmt.Println("NCOMPANIES", NCOMPANIES)
-	fmt.Println("STORAGE_TANK_LIMIT", STORAGE_TANK_LIMIT)
-	fmt.Println("FORCED_SALE_PRICE", FORCED_SALE_PRICE)
-	fmt.Println("BUILDING_COST", BUILDING_COST)
-	fmt.Println("TRANSPORT_COST", TRANSPORT_COST)
-	fmt.Println("GAME_END_RIG_PRICE", GAME_END_RIG_PRICE)
-	fmt.Println("GAME_END_MARKER_PRICE", GAME_END_MARKER_PRICE)
-	fmt.Println("GOAL_MULTIPLIER", GOAL_MULTIPLIER)
-	fmt.Println("TRUCK_COLUMN_MULTIPLIER", TRUCK_COLUMN_MULTIPLIER)
-	fmt.Println("PREV_GOAL_MULTIPLER", PREV_GOAL_MULTIPLER)
-	fmt.Println("TRAIN_COLUMN_MULTIPLIER", TRAIN_COLUMN_MULTIPLIER)
-	fmt.Println("TR_ACTION_CARDS", TR_ACTION_CARDS)
-	fmt.Println("TR_COMPUTE_SCORE", TR_COMPUTE_SCORE)
-	fmt.Println("TR_FINAL_PATH", TR_FINAL_PATH)
-	fmt.Printf("TILES: %v\n", TILES)
-	nt := NewTiles()
+	fmt.Println("TRAIN_COSTS", game.TRAIN_COSTS)
+	fmt.Println("INITIAL_CASH", game.INITIAL_CASH)
+	fmt.Println("INITIAL_PRICE", game.INITIAL_PRICE)
+	fmt.Println("INITIAL_OIL_RIGS", game.INITIAL_OIL_RIGS)
+	fmt.Println("INITIAL_OIL_MARKERS", game.INITIAL_OIL_MARKERS)
+	fmt.Println("TRUCK_INIT_ROWS", game.TRUCK_INIT_ROWS)
+	fmt.Println("NCOMPANIES", game.NCOMPANIES)
+	fmt.Println("STORAGE_TANK_LIMIT", game.STORAGE_TANK_LIMIT)
+	fmt.Println("FORCED_SALE_PRICE", game.FORCED_SALE_PRICE)
+	fmt.Println("BUILDING_COST", game.BUILDING_COST)
+	fmt.Println("TRANSPORT_COST", game.TRANSPORT_COST)
+	fmt.Println("GAME_END_RIG_PRICE", game.GAME_END_RIG_PRICE)
+	fmt.Println("GAME_END_MARKER_PRICE", game.GAME_END_MARKER_PRICE)
+	fmt.Println("GOAL_MULTIPLIER", game.GOAL_MULTIPLIER)
+	fmt.Println("TRUCK_COLUMN_MULTIPLIER", game.TRUCK_COLUMN_MULTIPLIER)
+	fmt.Println("PREV_GOAL_MULTIPLER", game.PREV_GOAL_MULTIPLER)
+	fmt.Println("TRAIN_COLUMN_MULTIPLIER", game.TRAIN_COLUMN_MULTIPLIER)
+	fmt.Println("TR_ACTION_CARDS", game.TR_ACTION_CARDS)
+	fmt.Println("TR_COMPUTE_SCORE", game.TR_COMPUTE_SCORE)
+	fmt.Println("TR_FINAL_PATH", game.TR_FINAL_PATH)
+	fmt.Printf("TILES: %v\n", game.TILES)
+	nt := game.NewTiles()
 	fmt.Printf("tiles: %v\n", nt.tiles)
 	n := nt.PopTile(3)
 	if n == -1 {
@@ -45,10 +48,10 @@ func TestConfig() {
 	fmt.Println("Tile 1: ", n)
 	fmt.Printf("tiles: %v\n", nt.tiles)
 
-	bc := NewBeigeCards()
+	bc := game.NewBeigeCards()
 	l := len(bc.cards)
 	fmt.Printf("(len: %v) Beige cards: %v\n", l, bc.cards)
-	var top *BeigeCard
+	var top *game.BeigeCard
 	top = bc.PopBeigeCard()
 	if top != nil {
 		fmt.Println("oops. empty")
@@ -56,14 +59,14 @@ func TestConfig() {
 	l = len(bc.cards)
 	fmt.Printf("top: %v\nlen: %v\nBeige cards: %v\n", *top, l, bc.cards)
 	fmt.Printf("movement: %v\n", top.movement)
-	rc := NewRedCards()
+	rc := game.NewRedCards()
 	fmt.Println("Red cards: ", rc.cards)
-	var redtop *RedCard
+	var redtop *game.RedCard
 	redtop = rc.PopRedCard()
 	l = len(rc.cards)
 	fmt.Printf("redtop: %v\nlen: %v\nRed cards: %v\n", *redtop, l, rc.cards)
 
-	licenseCards := NewLicenseCards()
+	licenseCards := game.NewLicenseCards()
 	fmt.Printf("License cards: %v\n", licenseCards.cards)
 	fmt.Println("Pop: ", licenseCards.PopLicenseCard())
 	fmt.Println("Pop: ", licenseCards.PopLicenseCard())

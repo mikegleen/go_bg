@@ -1,7 +1,8 @@
-package main
+package board
 
 import (
 	"fmt"
+	"giganten/game"
 	"math"
 	"strings"
 )
@@ -33,9 +34,9 @@ type Node struct {
 	Exhausted  bool
 	Goal       int // count of adjacent nodes with unbuilt wells
 	Derrick    bool
-	Truck      *Player // set when a truck moves here
-	Adjacent   []*Node // will be populated by SetNeighbors
-	Cell       string  // this node's string from rawboard, for debugging
+	Truck      *game.Player // set when a truck moves here
+	Adjacent   []*Node      // will be populated by SetNeighbors
+	Cell       string       // this node's string from rawboard, for debugging
 
 	// Fields set by dijkstra
 	Distance int
@@ -72,7 +73,7 @@ func SprintPreviousNode(n *Node) string {
 	return ret
 }
 
-func (n *Node) SprintNode() string {
+func (node *Node) SprintNode() string {
 	/*
 		Implement the function of the Python __str__ method
 	*/
@@ -85,16 +86,16 @@ func (n *Node) SprintNode() string {
 		return t
 	}
 
-	s := fmt.Sprintf("%s t: %d, w: %d ", n.Id, n.Terrain, n.Wells)
-	s += fmt.Sprintf("ex=%s, goal=%d, derrick=%s, truck=%s, ", tf(n.Exhausted), n.Goal, tf(n.Derrick), SprintPlayer(n.Truck))
-	s += fmt.Sprintf("previous={%s}, ", SprintPreviousNode(n))
-	d := fmt.Sprintf("%d", n.Distance)
-	if n.Distance == math.MaxInt {
+	s := fmt.Sprintf("%s t: %d, w: %d ", node.Id, node.Terrain, node.Wells)
+	s += fmt.Sprintf("ex=%s, goal=%d, derrick=%s, truck=%s, ", tf(node.Exhausted), node.Goal, tf(node.Derrick), game.SprintPlayer(node.Truck))
+	s += fmt.Sprintf("previous={%s}, ", SprintPreviousNode(node))
+	d := fmt.Sprintf("%d", node.Distance)
+	if node.Distance == math.MaxInt {
 		d = "∞"
 	}
 	s += fmt.Sprintf("dist: %s, ", d)
 	adjacents := "{"
-	for _, adj := range n.Adjacent {
+	for _, adj := range node.Adjacent {
 		adjacents += adj.Id + ","
 	}
 	adjacents = strings.TrimSuffix(adjacents, ",")
@@ -142,11 +143,11 @@ func (node *Node) FromArrow() string {
 	return downwardsArrow
 }
 
-func (n *Node) SetNeighbors(board [][]*Node) {
+func (node *Node) SetNeighbors(board [][]*Node) {
 	/*
 		This is called by NewGraph.
 
-		:param board: the board from a Graph instance
+		param board: the board from a Graph instance
 
 		adjacent contains a list of nodes next to this node.
 		A node can have up to 4 adjacent, reduced if it is on an edge.
@@ -155,8 +156,8 @@ func (n *Node) SetNeighbors(board [][]*Node) {
 	*/
 	set1Neighbor := func(nrow, ncol int) {
 		neighbor := board[nrow][ncol]
-		n.Adjacent = append(n.Adjacent, neighbor)
-		if n.Wells > 0 && !n.Derrick {
+		node.Adjacent = append(node.Adjacent, neighbor)
+		if node.Wells > 0 && !node.Derrick {
 			if neighbor.Wells == 0 {
 				neighbor.Goal += 1
 			}
@@ -165,37 +166,37 @@ func (n *Node) SetNeighbors(board [][]*Node) {
 
 	lastrow := len(board) - 1
 	lastcol := len(board[0]) - 1
-	if n.Row > 0 {
-		set1Neighbor(n.Row-1, n.Col)
+	if node.Row > 0 {
+		set1Neighbor(node.Row-1, node.Col)
 	}
-	if n.Col > 0 {
-		set1Neighbor(n.Row, n.Col-1)
+	if node.Col > 0 {
+		set1Neighbor(node.Row, node.Col-1)
 	}
-	if n.Row < lastrow {
-		set1Neighbor(n.Row+1, n.Col)
+	if node.Row < lastrow {
+		set1Neighbor(node.Row+1, node.Col)
 	}
-	if n.Col < lastcol {
-		set1Neighbor(n.Row, n.Col+1)
+	if node.Col < lastcol {
+		set1Neighbor(node.Row, node.Col+1)
 	}
 }
 
-func (n *Node) AddDerrick() {
-	if n.Derrick {
-		panic("node " + n.Id + " already has derrick.")
+func (node *Node) AddDerrick() {
+	if node.Derrick {
+		panic("node " + node.Id + " already has derrick.")
 	}
-	n.Derrick = true
-	for _, node := range n.Adjacent {
+	node.Derrick = true
+	for _, node := range node.Adjacent {
 		node.Goal--
 		if node.Goal <= 0 {
-			panic("node " + node.Id + " Goal <= 0, adding derrick to node " + n.Id)
+			panic("node " + node.Id + " Goal <= 0, adding derrick to node " + node.Id)
 		}
 	}
 }
 
-func (n *Node) RemoveDerrick() {
-	if !n.Derrick {
-		panic("node " + n.Id + " attempting to remove nonexisting derrick.")
+func (node *Node) RemoveDerrick() {
+	if !node.Derrick {
+		panic("node " + node.Id + " attempting to remove nonexisting derrick.")
 	}
-	n.Derrick = false
-	n.Exhausted = true
+	node.Derrick = false
+	node.Exhausted = true
 }
