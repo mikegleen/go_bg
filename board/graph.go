@@ -14,7 +14,7 @@ type Graph struct {
 	ThreePlayers bool
 	Rows         int
 	Columns      int
-	BoardSize    int
+	BoardSize    int       // rows * columns
 	Board        [][]*Node // rows, columns
 	Nodes        []*Node   // 1d array easier to iterate over all nodes
 	/*
