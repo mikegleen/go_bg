@@ -26,8 +26,8 @@ type Player struct {
 }
 
 func (p *Player) SetActions(nlicenses, movement, markers, backwards, oilprice int) {
-	p.ActionList = append(p.ActionList, Actions{nlicenses: nlicenses, movement: movement,
-		markers: markers, backwards: backwards, oilprice: oilprice})
+	p.Actions = ActionsT{nlicenses: nlicenses, movement: movement,
+		markers: markers, backwards: backwards, oilprice: oilprice}
 }
 
 func (p *Player) AdvanceTrain(verbos int) {
@@ -41,7 +41,7 @@ func (p *Player) AdvanceTrain(verbos int) {
 		p.TrainCol += 1
 	}
 	if verbos >= 2 {
-		fmt.Printf("AdvanceTrain: player: %v, movement: %v -> %v, train col: %v -> %v, truck distance: %v\n",
+		fmt.Printf("AdvanceTrain: player: %v, Movement: %v -> %v, train col: %v -> %v, truck distance: %v\n",
 			p.Id, oldMovement, movement, oldTrainCol, p.TrainCol, p.TruckNode.Distance)
 	}
 }

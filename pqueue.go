@@ -3,13 +3,13 @@ package dijkstra
 import (
 	"container/heap"
 	"fmt"
-	"giganten/board"
+	"giganten"
 	"math"
 	"strconv"
 )
 
 // A PriorityQueue implements heap.Interface and holds Items.
-type PriorityQueue []*board.Node
+type PriorityQueue []*main.Node
 
 // There are mixed receiver types because heap inherits sort.
 
@@ -34,7 +34,7 @@ func (pq PriorityQueue) Swap(i, j int) {
 //goland:noinspection GoMixedReceiverTypes
 func (pq *PriorityQueue) Push(x interface{}) {
 	n := len(*pq)
-	item := x.(*board.Node)
+	item := x.(*main.Node)
 	item.PqIndex = n
 	*pq = append(*pq, item)
 }
@@ -53,7 +53,7 @@ func (pq *PriorityQueue) Pop() interface{} {
 // update modifies the priority and value of an Item in the queue.
 //
 //goland:noinspection GoMixedReceiverTypes
-func (pq *PriorityQueue) update(item *board.Node, Distance int) {
+func (pq *PriorityQueue) update(item *main.Node, Distance int) {
 	item.Distance = Distance
 	heap.Fix(pq, item.PqIndex)
 }
@@ -71,7 +71,7 @@ func PqMain() {
 	pq := make(PriorityQueue, len(items))
 	i := 0
 	for value, priority := range items {
-		pq[i] = &board.Node{
+		pq[i] = &main.Node{
 			Distance: priority,
 			Id:       value,
 			PqIndex:  i,
@@ -81,7 +81,7 @@ func PqMain() {
 	heap.Init(&pq)
 
 	// Insert a new item and then modify its priority.
-	item := &board.Node{
+	item := &main.Node{
 		Id:       "orange",
 		Distance: 1,
 	}
@@ -90,7 +90,7 @@ func PqMain() {
 
 	// Take the items out; they arrive in decreasing priority order.
 	for pq.Len() > 0 {
-		item := heap.Pop(&pq).(*board.Node)
+		item := heap.Pop(&pq).(*main.Node)
 		fmt.Printf("%.2d:%s ", item.Distance, item.Id)
 	}
 	fmt.Println()

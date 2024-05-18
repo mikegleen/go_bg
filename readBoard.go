@@ -41,7 +41,7 @@ func ReadBoard(csvFilename string, byCol bool) (r [][]string) {
 	   If <variant> == "x" then this is a cell ignored for 3-person games.
 	   If <variant> == "d" then this cell contains a derrick (used for testing).
 
-	   :return: A list of rows containing tuples corresponding to the columns.
+	   :return: A list of rows containing lists corresponding to the columns.
 	            Each cell is the string as defined above.
 	*/
 	csvFile, err := os.Open(csvFilename)
