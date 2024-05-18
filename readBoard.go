@@ -1,7 +1,8 @@
-package board
+package main
 
 import (
 	"bufio"
+	"fmt"
 	"io"
 	"log"
 	"os"
@@ -45,27 +46,36 @@ func ReadBoard(csvFilename string, byCol bool) (r [][]string) {
 	            Each cell is the string as defined above.
 	*/
 	csvFile, err := os.Open(csvFilename)
+	fmt.Println("rawboard: " + csvFilename)
 	if err != nil {
 		log.Fatalln("Couldn't open the csv file", err)
 	}
 	defer csvFile.Close()
 	// Parse the file
 	nline := 0
-
+	lens := 0
+	// Read each line from csv
 	scanner := bufio.NewScanner(csvFile)
 	for scanner.Scan() {
 		line := scanner.Text()
 		err = scanner.Err()
-		// Read each line from csv
-
 		if err == io.EOF {
 			break
 		}
 		if err != nil {
 			log.Fatal(err)
 		}
+		line = strings.TrimSpace(line)
+		if len(line) == 0 || line[0] == '#' {
+			continue
+		}
 		nline++
 		s := strings.Fields(line)
+		if nline == 1 {
+			lens = len(s)
+		} else if len(s) != lens {
+			log.Fatalln(fmt.Sprintf("Line %v is %v fields, line 1 is %v fields", nline, len(s), lens))
+		}
 		r = append(r, s)
 	}
 	if byCol {

@@ -1,4 +1,4 @@
-package board
+package main
 
 import (
 	// "math"
@@ -85,7 +85,10 @@ func (g Graph) ResetGraph() {
 	}
 }
 
-func (g Graph) PrintBoard() {
+func (g Graph) PrintBoard(message string, verbos int) {
+	if verbos > 1 {
+		fmt.Println(message)
+	}
 	red := color.New(color.FgRed).SprintFunc()
 	var s string
 	for n := 0; n < g.Columns; n++ {

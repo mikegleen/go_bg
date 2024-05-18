@@ -1,12 +1,14 @@
-package game
+package main
 
 import (
 	"math"
-	"math/rand"
+	rand "math/rand/v2"
 )
 
 // import dij "giganten/dijkstra"
 // --------------------- TileType -----------------------
+//
+// Comments from Python version:
 // TILES: This dict defines the cardboard pieces that cover the squares
 //        containing wells.
 //        The key is the number of oil wells, the value is a list of the
@@ -33,7 +35,10 @@ func NewTiles() *TileType {
 		sTiles.Tiles[i] = make([]int, 12)
 		copy(sTiles.Tiles[i], TILES[i])
 		rand.Shuffle(len(sTiles.Tiles[i]),
-			func(ii, jj int) { sTiles.Tiles[i][ii], sTiles.Tiles[i][jj] = sTiles.Tiles[i][jj], sTiles.Tiles[i][ii] })
+			func(ii, jj int) {
+				sTiles.Tiles[i][ii], sTiles.Tiles[i][jj] =
+					sTiles.Tiles[i][jj], sTiles.Tiles[i][ii]
+			})
 	}
 	return sTiles
 }

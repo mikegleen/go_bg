@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+	"math"
+	"time"
 )
 
 func TestConfig() {
@@ -78,4 +80,44 @@ func TestConfig() {
 	fmt.Printf("q= %v, %p\n", q, &q)
 	q = append(q, 3)
 	fmt.Printf("q= %v, %p\n", q, &q)
+}
+
+func one_dijkstra(args argstruct) {
+	rawBoard := ReadBoard(args.board, false)
+	node12 := NewNode(1, 2, false)
+	g := NewGraph(rawBoard, 4)
+	if verbose > 1 {
+		fmt.Printf("node = (%v, %v) distance %v \n", node12.Row, node12.Col, node12.Distance)
+		fmt.Println(node12.SprintNode())
+		node12.Distance = 42
+		fmt.Println("dist: ", node12.PrDist())
+		g.PrintBoard("Initial board", verbose)
+	}
+
+	// visited, goals := dijkstra(g, g.Nodes[0], math.MaxInt, 3)
+	visited, goals := Dijkstra(g, g.Nodes[0], 3, verbose)
+	if verbose > 1 {
+		fmt.Printf("%v\n", visited)
+		fmt.Printf("%v\n", goals)
+		g.PrintBoard("Final board", verbose)
+	}
+
+	iterations := args.timeit
+	start := time.Now().UnixMilli()
+	for n := 0; n < iterations; n++ {
+		g.ResetGraph()
+	}
+	end := time.Now().UnixMilli()
+	elapsed := end - start
+	fmt.Printf("reset time: %v\n", elapsed)
+	start = time.Now().UnixMilli()
+	for n := 0; n < iterations; n++ {
+		g.ResetGraph()
+		_, _ = Dijkstra(g, g.Nodes[0], math.MaxInt, verbose)
+	}
+	end = time.Now().UnixMilli()
+	elapsed = end - start
+	fmt.Printf("elapsed: %v ms\n", elapsed)
+	fmt.Printf("Time per iteration: %v ms\n", float64(elapsed)/float64(iterations))
+
 }

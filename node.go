@@ -1,8 +1,7 @@
-package board
+package main
 
 import (
 	"fmt"
-	"giganten/game"
 	"math"
 	"strings"
 )
@@ -34,9 +33,9 @@ type Node struct {
 	Exhausted  bool
 	Goal       int // count of adjacent nodes with unbuilt wells
 	Derrick    bool
-	Truck      *game.Player // set when a truck moves here
-	Adjacent   []*Node      // will be populated by SetNeighbors
-	Cell       string       // this node's string from rawboard, for debugging
+	Truck      *Player // set when a truck moves here
+	Adjacent   []*Node // will be populated by SetNeighbors
+	Cell       string  // this node's string from rawboard, for debugging
 
 	// Fields set by dijkstra
 	Distance int
@@ -87,7 +86,7 @@ func (node *Node) SprintNode() string {
 	}
 
 	s := fmt.Sprintf("%s t: %d, w: %d ", node.Id, node.Terrain, node.Wells)
-	s += fmt.Sprintf("ex=%s, goal=%d, derrick=%s, truck=%s, ", tf(node.Exhausted), node.Goal, tf(node.Derrick), game.SprintPlayer(node.Truck))
+	s += fmt.Sprintf("ex=%s, goal=%d, derrick=%s, truck=%s, ", tf(node.Exhausted), node.Goal, tf(node.Derrick), SprintPlayer(node.Truck))
 	s += fmt.Sprintf("previous={%s}, ", SprintPreviousNode(node))
 	d := fmt.Sprintf("%d", node.Distance)
 	if node.Distance == math.MaxInt {
@@ -123,7 +122,8 @@ func (node *Node) PrWells() string {
 	if node.Derrick {
 		well = "D"
 	}
-	return strings.Repeat(well, node.Wells) + strings.Repeat(" ", 3-node.Wells)
+	//return strings.Repeat(well, node.Wells) + strings.Repeat(" ", 3-node.Wells)
+	return fmt.Sprintf("%-3s", strings.Repeat(well, node.Wells))
 }
 
 func (node *Node) FromArrow() string {

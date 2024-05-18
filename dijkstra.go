@@ -1,12 +1,11 @@
-package dijkstra
+package main
 
 import (
 	"container/heap"
 	"fmt"
-	"giganten"
 )
 
-func insertionSort(A []*main.Node) {
+func insertionSort(A []*Node) {
 	for i := 1; i < len(A); i++ {
 		key := A[i]
 		j := i - 1
@@ -18,9 +17,9 @@ func insertionSort(A []*main.Node) {
 	}
 }
 
-func Dijkstra(graph *main.Graph, root *main.Node, maxCost int, verbose int) ([]bool, map[*main.Node]bool) {
+func Dijkstra(graph *Graph, root *Node, maxCost int, verbose int) ([]bool, map[*Node]bool) {
 	var updated string
-	var current *main.Node
+	var current *Node
 	var nextnDist int
 
 	graph.ResetGraph()
@@ -31,13 +30,13 @@ func Dijkstra(graph *main.Graph, root *main.Node, maxCost int, verbose int) ([]b
 	}
 	unvisitedQueue := make(PriorityQueue, 0)
 	// visited := make(map[*Node]bool)
-	goals := make(map[*main.Node]bool)
+	goals := make(map[*Node]bool)
 	visited := make([]bool, graph.BoardSize)
 	heap.Init(&unvisitedQueue)
 	heap.Push(&unvisitedQueue, root)
 
 	for len(unvisitedQueue) > 0 {
-		current = heap.Pop(&unvisitedQueue).(*main.Node)
+		current = heap.Pop(&unvisitedQueue).(*Node)
 		if verbose >= 3 {
 			fmt.Printf("\n****current: %v\n", current.Id)
 		}

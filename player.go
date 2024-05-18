@@ -1,8 +1,7 @@
-package game
+package main
 
 import (
 	"fmt"
-	"giganten/board"
 	"strconv"
 )
 
@@ -12,11 +11,11 @@ type ActionsT struct {
 
 type Player struct {
 	Id             int
-	TruckNode      *board.Node
+	TruckNode      *Node
 	TruckHist      []string
 	TrainCol       int
 	FreeOilRigs    int
-	RigsInUse      []*board.Node
+	RigsInUse      []*Node
 	Cash           int
 	StorageTanks   []int // one tank at each company
 	Actions        ActionsT
