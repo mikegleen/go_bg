@@ -32,6 +32,46 @@ type argstruct struct {
 	verbose  int
 }
 
+type RawBoardType [][]string
+
+type GameType struct {
+	nplayers        int
+	black_train_col int
+	selling_price   []int
+	players         []*PlayerType
+	graph           *Graph
+	oilmarker_stock int
+	beigecards      *BeigeCards
+	redcards        *RedCards
+}
+
+func newGame(rawboard RawBoardType, args *argstruct) *GameType {
+	game := new(GameType)
+	game.graph = NewGraph(rawboard, args.nplayers)
+	game.nplayers = args.nplayers
+	game.black_train_col = 0
+	game.selling_price = make([]int, NCOMPANIES)
+	for n := 0; n < NCOMPANIES; n++ {
+		game.selling_price[n] = INITIAL_PRICE
+	}
+	game.players = make([]*PlayerType, game.nplayers)
+	for p := 0; p < args.nplayers; p++ {
+		player := new(PlayerType)
+		game.players[p] = player
+		player.Id = p
+		trucknode := game.graph.Board[p][0]
+		game.players[p].TruckNode = trucknode
+	}
+	game.beigecards = NewBeigeCards()
+	game.redcards = make([]*RedCard, len(RED_CARDS))
+	return game
+}
+
+func printGame(g *GameType) {
+	fmt.Printf("Players: %v, Black Train Col: %v\n", g.nplayers, g.black_train_col)
+	fmt.Println("Selling Price:", g.selling_price)
+}
+
 func getArgs() argstruct {
 	args := argstruct{}
 	flag.StringVar(&args.board, "board", RAWBOARD, `The file containing the board description.`)
@@ -51,12 +91,12 @@ p - pqMain`)
 	flag.Parse()
 	if args.test != "" {
 		u := strings.ToLower(args.test)
-		switch {
-		case u == "c":
+		switch u {
+		case "c":
 			args.config = true
-		case u == "d":
+		case "d":
 			args.dijkstra = true
-		case u == "p":
+		case "p":
 			args.pqMain = true
 		default:
 			panic("Invalid test.")
@@ -73,7 +113,7 @@ func main() {
 		os.Exit(0)
 	}
 	if args.dijkstra {
-		//rawBoard := ReadBoard(args.board, false)
+		//rawBoard := ReadRawBoard(args.board, false)
 		// g := NewGraph(rawBoard, args.nplayers)
 		one_dijkstra(args)
 		os.Exit(0)
@@ -85,12 +125,16 @@ func main() {
 
 	verbose = args.verbose
 	// fmt.Println("timeit", args.timeit)
-	rawBoard = ReadBoard(args.board, false)
+	rawBoard = ReadRawBoard(args.board, false)
 	if verbose > 1 {
 		fmt.Println("Printing rawboard.")
 		for _, row := range rawBoard {
 			fmt.Printf("%v\n", row)
 		}
+	}
+	for gamen := 0; gamen < args.games; gamen++ {
+		game := newGame(rawBoard, &args)
+		printGame(game)
 	}
 
 	fmt.Println(green("End Giganten."))
