@@ -33,9 +33,9 @@ type Node struct {
 	Exhausted  bool
 	Goal       int // count of adjacent nodes with unbuilt wells
 	Derrick    bool
-	Truck      *Player // set when a truck moves here
-	Adjacent   []*Node // will be populated by SetNeighbors
-	Cell       string  // this node's string from rawboard, for debugging
+	Truck      *PlayerType // set when a truck moves here
+	Adjacent   []*Node     // will be populated by SetNeighbors
+	Cell       string      // this node's string from rawboard, for debugging
 
 	// Fields set by dijkstra
 	Distance int
