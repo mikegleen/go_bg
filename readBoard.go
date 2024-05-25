@@ -24,7 +24,7 @@ func transpose(slice [][]string) [][]string {
 	return result
 }
 
-func ReadBoard(csvFilename string, byCol bool) (r [][]string) {
+func ReadRawBoard(csvFilename string, byCol bool) (r RawBoardType) {
 	/*
 	   :param: csvFilename: The file containing the board description.
 	   Each line in the csv file describes one row or one column of the board,
@@ -50,7 +50,12 @@ func ReadBoard(csvFilename string, byCol bool) (r [][]string) {
 	if err != nil {
 		log.Fatalln("Couldn't open the csv file", err)
 	}
-	defer csvFile.Close()
+	defer func(csvFile *os.File) {
+		err := csvFile.Close()
+		if err != nil {
+			panic("Died closing CSV file.")
+		}
+	}(csvFile)
 	// Parse the file
 	nline := 0
 	lens := 0
