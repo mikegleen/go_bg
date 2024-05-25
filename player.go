@@ -9,7 +9,7 @@ type ActionsT struct {
 	nlicenses, movement, markers, backwards, oilprice int
 }
 
-type Player struct {
+type PlayerType struct {
 	Id             int
 	TruckNode      *Node
 	TruckHist      []string
@@ -24,12 +24,12 @@ type Player struct {
 	NLicenses      int
 }
 
-func (p *Player) SetActions(nlicenses, movement, markers, backwards, oilprice int) {
+func (p *PlayerType) SetActions(nlicenses, movement, markers, backwards, oilprice int) {
 	p.Actions = ActionsT{nlicenses: nlicenses, movement: movement,
 		markers: markers, backwards: backwards, oilprice: oilprice}
 }
 
-func (p *Player) AdvanceTrain(verbos int) {
+func (p *PlayerType) AdvanceTrain(verbos int) {
 	movement := p.Actions.movement
 	oldMovement := movement
 	oldTrainCol := p.TrainCol
@@ -45,7 +45,7 @@ func (p *Player) AdvanceTrain(verbos int) {
 	}
 }
 
-func SprintPlayer(p *Player) string {
+func SprintPlayer(p *PlayerType) string {
 	if p == nil {
 		return "nil"
 	}
