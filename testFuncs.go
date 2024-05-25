@@ -83,7 +83,7 @@ func TestConfig() {
 }
 
 func one_dijkstra(args argstruct) {
-	rawBoard := ReadBoard(args.board, false)
+	rawBoard := ReadRawBoard(args.board, false)
 	node12 := NewNode(1, 2, false)
 	g := NewGraph(rawBoard, 4)
 	if verbose > 1 {
