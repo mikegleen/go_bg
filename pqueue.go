@@ -17,7 +17,7 @@ func (pq PriorityQueue) Len() int { return len(pq) }
 
 //goland:noinspection GoMixedReceiverTypes
 func (pq PriorityQueue) Less(i, j int) bool {
-	// We want Pop to give us the highest, not lowest, priority so we use greater than here.
+	// We want Pop to give us the highest, not lowest, priority, so we use greater than here.
 	// mlg: modified to give lowest
 	// fmt.Print(i, j, pq)
 	return pq[i].Distance < pq[j].Distance
