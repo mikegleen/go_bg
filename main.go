@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/fatih/color"
 	"math"
+	"math/rand/v2"
 	"os"
 	// "runtime/pprof"
 	"strings"
@@ -32,42 +33,110 @@ type argstruct struct {
 	verbose  int
 }
 
-type RawBoardType [][]string
+type RawBoard [][]string
 
-type GameType struct {
+type Game struct {
 	nplayers        int
 	black_train_col int
 	selling_price   []int
-	players         []*PlayerType
+	players         []*Player
 	graph           *Graph
 	oilmarker_stock int
 	beigecards      *BeigeCards
+	beigediscards   *BeigeCards
 	redcards        *RedCards
+	reddiscards     *RedCards
+	licensecards    *[]int
+	licensediscards *[]int
+	tiles           *Tiles
 }
 
-func newGame(rawboard RawBoardType, args *argstruct) *GameType {
-	game := new(GameType)
+func newGame(rawboard RawBoard, args *argstruct) *Game {
+	fmt.Println("begin newgame")
+	game := new(Game)
 	game.graph = NewGraph(rawboard, args.nplayers)
 	game.nplayers = args.nplayers
+	game.oilmarker_stock = INITIAL_OIL_MARKERS
 	game.black_train_col = 0
+
+	// Set the initial selling price for each of the companies
 	game.selling_price = make([]int, NCOMPANIES)
 	for n := 0; n < NCOMPANIES; n++ {
 		game.selling_price[n] = INITIAL_PRICE
 	}
-	game.players = make([]*PlayerType, game.nplayers)
+	game.players = make([]*Player, game.nplayers)
 	for p := 0; p < args.nplayers; p++ {
-		player := new(PlayerType)
+		trucknode := game.graph.Board[TRUCK_INIT_ROWS[p]][0]
+		player := NewPlayer(trucknode, p)
+		player.game = game
 		game.players[p] = player
-		player.Id = p
-		trucknode := game.graph.Board[p][0]
-		game.players[p].TruckNode = trucknode
+		trucknode.Truck = player
 	}
 	game.beigecards = NewBeigeCards()
-	game.redcards = make([]*RedCard, len(RED_CARDS))
+	game.redcards = NewRedCards()
+	game.licensecards = NewLicenseCards(INITIAL_SINGLE_LICENSES, INITIAL_DOUBLE_LICENSES)
+	game.licensediscards = new([]int)
+	game.tiles = NewTiles()
+
+	// Place tiles on the board
+	for _, node := range game.graph.Nodes {
+		if node.Wells > 0 {
+			node.OilReserve = game.tiles.PopTile(node.Wells)
+			if args.verbose >= 3 {
+				fmt.Printf("Node col, row: %d, %d oil reserve %d\n", node.Col, node.Row,
+					node.OilReserve)
+			}
+		}
+	}
 	return game
 }
 
-func printGame(g *GameType) {
+func (g *Game) move_black_train(spaces_to_move int) bool {
+	g.black_train_col += spaces_to_move
+	game_ended := g.black_train_col >= g.graph.Columns
+	return game_ended
+}
+
+func (g *Game) audit_licenses() {
+	licenses := 0
+	for _, player := range g.players {
+		licenses += player.SingleLicenses
+		licenses += player.DoubleLicenses
+	}
+	for _, license_value := range *g.licensecards {
+		licenses += license_value
+	}
+	if licenses != TOTAL_LICENSES {
+		panic(fmt.Sprintf("total licenses %d, should be %d", licenses, TOTAL_LICENSES))
+	}
+}
+
+func (g *Game) draw_red_action_card() *RedCard {
+	card := g.redcards.PopRedCard()
+	if card != nil {
+		return card
+	}
+	// Move the cards from the discard pile to the active pile
+	for len(*g.reddiscards) > 0 {
+		l := len(*g.reddiscards)
+		r := (*g.reddiscards)[l-1]
+		*g.redcards = append(*g.redcards, r)
+		*g.reddiscards = (*g.reddiscards)[:l-1]
+	}
+	if len(*g.redcards) == 0 {
+		panic("out of red action cards")
+	}
+	rc := *g.redcards
+	rand.Shuffle(len(rc), func(ii, jj int) { rc[ii], rc[jj] = rc[jj], rc[ii] })
+	card = g.redcards.PopRedCard()
+	return card
+}
+
+func (g *Game) deal_licenses(player Player) {
+
+}
+
+func printGame(g *Game) {
 	fmt.Printf("Players: %v, Black Train Col: %v\n", g.nplayers, g.black_train_col)
 	fmt.Println("Selling Price:", g.selling_price)
 }
@@ -105,11 +174,40 @@ p - pqMain`)
 	return args
 }
 
+func oneTurn(turn int, playerlist []*Player, game *Game) bool {
+
+	return true
+}
+
+func PlayGame(game *Game, args *argstruct) {
+	gameEnded := false
+	turn := 0
+	playerList := make([]*Player, 0)
+	for !gameEnded {
+		turn++
+		for startPlayerNum, _ := range game.players {
+			playerNum := startPlayerNum
+			for n := 0; n < game.nplayers; n++ {
+				playerList = append(playerList, game.players[playerNum])
+				playerNum++
+				if playerNum >= game.nplayers {
+					playerNum = 0
+				}
+			}
+			gameEnded = oneTurn(turn, playerList, game)
+			if args.verbose >= 2 {
+				game.audit_licenses()
+			}
+		}
+	}
+}
+
 func main() {
 	green := color.New(color.FgGreen).SprintFunc()
 	args := getArgs()
 	if args.config {
-		TestConfig()
+		rawBoard := ReadRawBoard(args.board, false)
+		TestConfig(rawBoard, &args)
 		os.Exit(0)
 	}
 	if args.dijkstra {
@@ -134,7 +232,12 @@ func main() {
 	}
 	for gamen := 0; gamen < args.games; gamen++ {
 		game := newGame(rawBoard, &args)
-		printGame(game)
+		fmt.Println(game.tiles)
+		// printGame(game)
+		if args.print {
+			printGame(game)
+			game.graph.PrintBoard("board:", 1)
+		}
 	}
 
 	fmt.Println(green("End Giganten."))

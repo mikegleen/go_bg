@@ -33,9 +33,9 @@ type Node struct {
 	Exhausted  bool
 	Goal       int // count of adjacent nodes with unbuilt wells
 	Derrick    bool
-	Truck      *PlayerType // set when a truck moves here
-	Adjacent   []*Node     // will be populated by SetNeighbors
-	Cell       string      // this node's string from rawboard, for debugging
+	Truck      *Player // set when a truck moves here
+	Adjacent   []*Node // will be populated by SetNeighbors
+	Cell       string  // this node's string from rawboard, for debugging
 
 	// Fields set by dijkstra
 	Distance int
@@ -122,7 +122,6 @@ func (node *Node) PrWells() string {
 	if node.Derrick {
 		well = "D"
 	}
-	//return strings.Repeat(well, node.Wells) + strings.Repeat(" ", 3-node.Wells)
 	return fmt.Sprintf("%-3s", strings.Repeat(well, node.Wells))
 }
 
@@ -186,10 +185,10 @@ func (node *Node) AddDerrick() {
 	}
 	node.Derrick = true
 	for _, node := range node.Adjacent {
-		node.Goal--
 		if node.Goal <= 0 {
 			panic("node " + node.Id + " Goal <= 0, adding derrick to node " + node.Id)
 		}
+		node.Goal--
 	}
 }
 

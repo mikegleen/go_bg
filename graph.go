@@ -72,9 +72,12 @@ func NewGraph(rawBoard [][]string, nPlayers int) *Graph {
 	// yellow := color.New(color.FgYellow).SprintFunc()
 	green := color.New(color.FgGreen).SprintFunc()
 	graph.TerrainCh[0] = "@"
-	graph.TerrainCh[1] = green("-  ")
-	graph.TerrainCh[2] = green("~~ ")
-	graph.TerrainCh[3] = green("^^^")
+	//graph.TerrainCh[1] = green("   ")
+	//graph.TerrainCh[2] = green("~~ ")
+	//graph.TerrainCh[3] = green("^^^")
+	graph.TerrainCh[1] = green(" ")
+	graph.TerrainCh[2] = green("~")
+	graph.TerrainCh[3] = green("^")
 
 	return graph
 }
@@ -89,7 +92,8 @@ func (g Graph) PrintBoard(message string, verbos int) {
 	if verbos > 1 {
 		fmt.Println(message)
 	}
-	red := color.New(color.FgRed).SprintFunc()
+	red := color.New(color.FgHiRed).SprintFunc()
+	yellow := color.New(color.BgHiYellow).Add(color.FgBlack).SprintFunc()
 	var s string
 	for n := 0; n < g.Columns; n++ {
 		s += fmt.Sprintf("| %03d ", n)
@@ -99,18 +103,23 @@ func (g Graph) PrintBoard(message string, verbos int) {
 	for nRow, row := range g.Board {
 		fmt.Println("   " + strings.Repeat("|—————", g.Columns) + "|")
 		r1 := ""
-		for _, node := range row {
-			r1 += g.TerrainCh[node.Terrain] + node.PrDist() + "|"
-		}
-		fmt.Printf(" %02d|%s\n", nRow, r1)
 		r2 := ""
 		for _, node := range row {
+			terrain := g.TerrainCh[node.Terrain]
+			truck := " "
+			if node.Truck != nil {
+				truck = yellow(strconv.Itoa(node.Truck.Id))
+			}
+			r1 += terrain + truck + " " + node.PrDist() + "|"
 			goal := " "
 			if node.Goal > 0 {
 				goal = red(strconv.Itoa(node.Goal))
 			}
 			r2 += node.PrWells() + node.FromArrow() + goal + "|"
 		}
+		//for _, node := range row {
+		//}
+		fmt.Printf(" %02d|%s\n", nRow, r1)
 		fmt.Printf("   |%s\n", r2)
 	}
 

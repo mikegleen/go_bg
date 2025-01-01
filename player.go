@@ -9,27 +9,39 @@ type ActionsT struct {
 	nlicenses, movement, markers, backwards, oilprice int
 }
 
-type PlayerType struct {
+type Player struct {
 	Id             int
+	game           *Game
 	TruckNode      *Node
 	TruckHist      []string
-	TrainCol       int
+	TrainCol       int // train starts at column zero
 	FreeOilRigs    int
 	RigsInUse      []*Node
 	Cash           int
 	StorageTanks   []int // one tank at each company
 	Actions        ActionsT
-	SingleLicenses LicenseCards
-	DoubleLicenses LicenseCards
-	NLicenses      int
+	SingleLicenses int // each SingleLicense is worth one License
+	DoubleLicenses int // each DoubleLicense is worth two Licenses
 }
 
-func (p *PlayerType) SetActions(nlicenses, movement, markers, backwards, oilprice int) {
+func NewPlayer(trucknode *Node, id int) *Player {
+	player := new(Player)
+	player.Id = id
+	player.Cash = INITIAL_CASH
+	player.FreeOilRigs = INITIAL_OIL_RIGS
+	player.RigsInUse = make([]*Node, 0, 5)
+	player.TruckNode = trucknode
+	player.TruckHist = make([]string, 0, 20)
+	player.StorageTanks = make([]int, NCOMPANIES)
+	return player
+}
+
+func (p *Player) SetActions(nlicenses, movement, markers, backwards, oilprice int) {
 	p.Actions = ActionsT{nlicenses: nlicenses, movement: movement,
 		markers: markers, backwards: backwards, oilprice: oilprice}
 }
 
-func (p *PlayerType) AdvanceTrain(verbos int) {
+func (p *Player) AdvanceTrain(verbos int) {
 	movement := p.Actions.movement
 	oldMovement := movement
 	oldTrainCol := p.TrainCol
@@ -45,7 +57,7 @@ func (p *PlayerType) AdvanceTrain(verbos int) {
 	}
 }
 
-func SprintPlayer(p *PlayerType) string {
+func SprintPlayer(p *Player) string {
 	if p == nil {
 		return "nil"
 	}

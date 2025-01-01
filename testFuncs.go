@@ -6,7 +6,11 @@ import (
 	"time"
 )
 
-func TestConfig() {
+func TestLicenseCards() {
+
+}
+
+func TestConfig(rawBoard RawBoard, args *argstruct) {
 
 	// cpufile, err := os.Create("cpu.pprof")
 	// if err != nil {
@@ -36,42 +40,45 @@ func TestConfig() {
 	fmt.Println("TRUCK_COLUMN_MULTIPLIER", TRUCK_COLUMN_MULTIPLIER)
 	fmt.Println("PREV_GOAL_MULTIPLER", PREV_GOAL_MULTIPLER)
 	fmt.Println("TRAIN_COLUMN_MULTIPLIER", TRAIN_COLUMN_MULTIPLIER)
-	fmt.Println("TR_ACTION_CARDS", TR_ACTION_CARDS)
-	fmt.Println("TR_COMPUTE_SCORE", TR_COMPUTE_SCORE)
-	fmt.Println("TR_FINAL_PATH", TR_FINAL_PATH)
+	fmt.Println("TRACE_ACTION_CARDS", TRACE_ACTION_CARDS)
+	fmt.Println("TRACE_COMPUTE_SCORE", TRACE_COMPUTE_SCORE)
+	fmt.Println("TRACE_FINAL_PATH", TRACE_FINAL_PATH)
 	fmt.Printf("TILES: %v\n", TILES)
 	nt := NewTiles()
-	fmt.Printf("tiles: %v\n", nt.Tiles)
+	fmt.Printf("tiles: %v\n", *nt)
+	nt = NewTiles()
+	fmt.Printf("tiles: %v\n", *nt)
 	n := nt.PopTile(3)
 	if n == -1 {
 		fmt.Println("oops.")
 	}
 	fmt.Println("Tile 1: ", n)
-	fmt.Printf("tiles: %v\n", nt.Tiles)
+	fmt.Printf("tiles: %v\n", *nt)
 
 	bc := NewBeigeCards()
-	l := len(bc.Cards)
-	fmt.Printf("(len: %v) Beige cards: %v\n", l, bc.Cards)
+	l := len(*bc)
+	fmt.Printf("(len: %v) Beige cards: %v\n", l, *bc)
 	var top *BeigeCard
 	top = bc.PopBeigeCard()
-	if top != nil {
-		fmt.Println("oops. empty")
+	if top == nil {
+		fmt.Println("oops. BeigeCards is empty")
+	} else {
+		l = len(*bc)
+		fmt.Printf("top: %v\nlen: %v Beige cards: %v\n", *top, l, *bc)
 	}
-	l = len(bc.Cards)
-	fmt.Printf("top: %v\nlen: %v\nBeige cards: %v\n", *top, l, bc.Cards)
 	fmt.Printf("movement: %v\n", top.Movement)
-	rc := NewRedCards()
-	fmt.Println("Red cards: ", rc.Cards)
+	rc_p := NewRedCards()
+	fmt.Println("Red cards: ", *rc_p)
 	var redtop *RedCard
-	redtop = rc.PopRedCard()
-	l = len(rc.Cards)
-	fmt.Printf("redtop: %v\nlen: %v\nRed cards: %v\n", *redtop, l, rc.Cards)
+	redtop = rc_p.PopRedCard()
+	l = len(*rc_p)
+	fmt.Printf("redtop: %v\nlen: %v\nRed cards: %v\n", *redtop, l, *rc_p)
 
-	licenseCards := NewLicenseCards()
-	fmt.Printf("License cards: %v\n", licenseCards.Cards)
-	fmt.Println("Pop: ", licenseCards.PopLicenseCard())
-	fmt.Println("Pop: ", licenseCards.PopLicenseCard())
-	fmt.Println("Pop: ", licenseCards.PopLicenseCard())
+	licenseCards := NewLicenseCards(INITIAL_SINGLE_LICENSES, INITIAL_DOUBLE_LICENSES)
+	fmt.Printf("License cards: %v\n", licenseCards)
+	fmt.Println("Pop: ", PopLicenseCard(licenseCards))
+	fmt.Println("Pop: ", PopLicenseCard(licenseCards))
+	fmt.Println("Pop: ", PopLicenseCard(licenseCards))
 
 	q := make([]int, 10)
 	fmt.Printf("q= %v, %p\n", q, &q)
@@ -80,6 +87,11 @@ func TestConfig() {
 	fmt.Printf("q= %v, %p\n", q, &q)
 	q = append(q, 3)
 	fmt.Printf("q= %v, %p\n", q, &q)
+	fmt.Println("newGame")
+	newgame := newGame(rawBoard, args)
+	fmt.Println("nplayers = ", newgame.nplayers)
+	*newgame.licensediscards = append(*newgame.licensediscards, 2)
+	fmt.Println("licensediscards", *newgame.licensediscards)
 }
 
 func one_dijkstra(args argstruct) {
